@@ -8,8 +8,7 @@ import json
 
 # import tracks from csv
 try:
-    df_1 = pd.read_csv('track1.csv')
-    df_2 = pd.read_csv('track2.csv')
+    df_path = pd.read_csv('track1.csv')
     df_airSpeed = pd.read_csv('air_speed.csv')
 except OSError:
     print("Could not connect to database...")
@@ -25,12 +24,9 @@ def creat_list_from_csv(df, lat_point, lon_point, high_point):
     return points_list
 
 
-# form= list[lat, lon, high]
-path1_Alist = creat_list_from_csv(df_1, 'lat_a', 'lat_a', 'hight_a(m)')  # points a in track 1
-path1_Blist = creat_list_from_csv(df_1, 'lat_b', 'lat_b', 'hight_b(m)')  # points b in track 1
-path2_Alist = creat_list_from_csv(df_2, 'lat_a', 'lat_a', 'hight_a(m)')  # points a in track 2
-path2_Blist = creat_list_from_csv(df_2, 'lat_b', 'lat_b', 'hight_b(m)')  # points b in track 2
-#print(path1_Alist)
+# form=> list[lat, lon, high]
+path1_Alist = creat_list_from_csv(df_path, 'lat_a', 'lat_a', 'hight_a(m)')  # points a in track 1
+path1_Blist = creat_list_from_csv(df_path, 'lat_b', 'lat_b', 'hight_b(m)')  # points b in track 1
 
 
 def clc_dist_between_2points(lat1, lon1, lat2, lon2):
@@ -38,7 +34,6 @@ def clc_dist_between_2points(lat1, lon1, lat2, lon2):
     coordinate2 = (lat2, lon2)
     # dist_mil= hs.haversine(coordinate1,coordinate2,unit=Unit.MILES)
     dist_metre = hs.haversine(coordinate1, coordinate2, unit=Unit.METERS)
-    #print('dist meter', dist_metre )
     return dist_metre
 
 
@@ -54,18 +49,11 @@ def clc_azimuth(lat1, lon1, lat2, lon2):
 # air speed from csv
 def get_Aspeed(weight):
     w = pd.DataFrame(df_airSpeed['weight'])
-    weight_list = w.to_numpy()
+    weight_list = list(w.to_numpy())
     s = pd.DataFrame(df_airSpeed['air speed'])
-    Aspeed_list = s.to_numpy()
+    Aspeed_list = list(s.to_numpy())
     weight_mod = weight - (weight % 50)  # rounding down
-    for i in range(len(s)):
-        if weight_mod == weight_list[i]:
-            break
-        else:
-            continue
-    #print(Aspeed_list[i])
-    return Aspeed_list[i]
-
+    return Aspeed_list[weight_list.index(weight_mod)]
 
 def get_weather(lat, lon, request):
     api_key = "c80b790a2fd8650bc690c41a4c001f0a"
